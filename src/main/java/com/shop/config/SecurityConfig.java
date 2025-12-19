@@ -71,10 +71,10 @@ public class SecurityConfig {
             )
             
             // 4. 记住我功能（可选）
-            .rememberMe(remember -> remember
-                .key("uniqueAndSecret")                 // 加密密钥
-                .tokenValiditySeconds(86400)            // 有效期 1 天
-            )
+            // .rememberMe(remember -> remember
+            //     .key("uniqueAndSecret")                 // 加密密钥
+            //     .tokenValiditySeconds(86400)            // 有效期 1 天
+            // )
             
             // 5. Session 管理
             .sessionManagement(session -> session

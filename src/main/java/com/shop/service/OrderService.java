@@ -100,14 +100,14 @@ public class OrderService {
      * 更新订单状态
      */
     @Transactional
-    public void updateStatus(Long orderId, String status) {
+    public Order updateStatus(Long orderId, String status) {
         Order order = findById(orderId);
         if (order == null) {
             throw new RuntimeException("订单不存在");
         }
-        
+
         order.setStatus(status);
-        orderRepository.save(order);
+        return orderRepository.save(order);
     }
     
     /**

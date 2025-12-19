@@ -8,6 +8,7 @@ import com.shop.entity.User;
 import com.shop.service.OrderService;
 import com.shop.service.ProductService;
 import com.shop.service.UserService;
+import com.shop.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,6 +33,9 @@ public class AdminController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private EmailService emailService;
     
     /**
      * 管理员首页
@@ -122,11 +126,27 @@ public class AdminController {
      */
     @PostMapping("/orders/{id}/status")
     public String updateOrderStatus(@PathVariable("id") Long id,
-                                   @RequestParam("status") String status,
-                                   RedirectAttributes redirectAttributes) {
+            @RequestParam("status") String status,
+            RedirectAttributes redirectAttributes) {
         try {
-            orderService.updateStatus(id, status);
-            redirectAttributes.addFlashAttribute("message", "订单状态已更新");
+            // 获取订单和用户信息
+            Order order = orderService.findById(id);
+            if (order == null) {
+                throw new RuntimeException("订单不存在");
+            }
+
+            String oldStatus = order.getStatus();
+            User user = userService.findById(order.getUserId());
+
+            // 更新订单状态（获取更新后的订单对象）
+            Order updatedOrder = orderService.updateStatus(id, status);
+
+            // 发送邮件通知
+            if (user != null && !oldStatus.equals(status)) {
+                emailService.sendOrderStatusChangeEmail(user, updatedOrder, oldStatus, status);
+            }
+
+            redirectAttributes.addFlashAttribute("message", "订单状态已更新，邮件通知已发送");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
