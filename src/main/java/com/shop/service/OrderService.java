@@ -1,6 +1,8 @@
 package com.shop.service;
+import java.util.ArrayList;
 import java.util.Arrays;
 import com.shop.dto.CartItem;
+import com.shop.dto.ProductSalesDTO;
 import com.shop.entity.Order;
 import com.shop.entity.OrderItem;
 import com.shop.entity.User;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -167,5 +170,54 @@ public class OrderService {
      */
     public long getPaidOrderCount() {
         return orderRepository.countByStatusIn(Arrays.asList("PAID", "SHIPPED", "COMPLETED"));
+    }
+    
+    /**
+     * 统计某个状态的订单金额
+     */
+    public BigDecimal getSalesByStatus(String status) {
+        return orderRepository.getSalesByStatus(status);
+    }
+
+    /**
+     * 统计本月订单数
+     */
+    public long getOrdersThisMonth() {
+        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+        return orderRepository.countOrdersThisMonth(startOfMonth);
+    }
+
+    /**
+     * 统计本月销售额
+     */
+    public BigDecimal getSalesThisMonth() {
+        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+        return orderRepository.getSalesThisMonth(startOfMonth);
+    }
+
+    /**
+     * 获取商品销售统计
+     */
+    public List<ProductSalesDTO> getProductSalesStatistics() {
+        List<Object[]> results = orderItemRepository.getProductSalesStatistics();
+        List<ProductSalesDTO> statistics = new ArrayList<>();
+
+        for (Object[] result : results) {
+            ProductSalesDTO dto = new ProductSalesDTO();
+            dto.setProductId(((Number) result[0]).longValue());
+            dto.setProductName((String) result[1]);
+            dto.setSoldQuantity(((Number) result[2]).longValue());
+            dto.setSalesAmount((BigDecimal) result[3]);
+            statistics.add(dto);
+        }
+
+        return statistics;
+    }
+    
+    /**
+     * 统计某个状态的订单数
+     */
+    public long countByStatus(String status) {
+        return orderRepository.countByStatus(status);
     }
 }

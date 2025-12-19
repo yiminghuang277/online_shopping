@@ -20,10 +20,10 @@
                 👤 <span sec:authentication="name"></span>
             </span>
             <form th:action="@{/logout}" method="post" style="display: inline;">
-    <button type="submit" style="background: none; border: none; color: white; cursor: pointer; font-size: 1rem;">
-        退出
-    </button>
-</form>
+                <button type="submit" style="background: none; border: none; color: white; cursor: pointer; font-size: 1rem;">
+                    退出
+                </button>
+            </form>
         </div>
     </nav>
 
@@ -58,15 +58,22 @@
                         <td>¥<span th:text="${#numbers.formatDecimal(order.totalPrice, 1, 2)}"></span></td>
                         <td>
                             <span th:switch="${order.status}">
-                                <span th:case="'PENDING'" style="color: #f39c12;">待支付</span>
-                                <span th:case="'PAID'" style="color: #27ae60;">已支付</span>
-                                <span th:case="'SHIPPED'" style="color: #3498db;">已发货</span>
-                                <span th:case="'COMPLETED'" style="color: #95a5a6;">已完成</span>
-                                <span th:case="'CANCELLED'" style="color: #e74c3c;">已取消</span>
+                                <span th:case="'PENDING'" style="color: #f39c12;">⏳ 待支付</span>
+                                <span th:case="'PAID'" style="color: #27ae60;">✅ 已支付</span>
+                                <span th:case="'SHIPPED'" style="color: #3498db;">🚚 已发货</span>
+                                <span th:case="'COMPLETED'" style="color: #95a5a6;">📦 已完成</span>
+                                <span th:case="'CANCELLED'" style="color: #e74c3c;">❌ 已取消</span>
                             </span>
                         </td>
                         <td th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
                         <td>
+                            <!-- 查看详情按钮 -->
+                            <a th:href="@{/admin/orders/{id}(id=${order.id})}" 
+                               class="btn btn-primary" 
+                               style="margin-right: 0.5rem; display: inline-block;">
+                                查看详情
+                            </a>
+                            
                             <!-- 状态更新表单 -->
                             <form th:action="@{/admin/orders/{id}/status(id=${order.id})}" 
                                   method="post" style="display: inline-flex; gap: 0.5rem;">
@@ -77,7 +84,7 @@
                                     <option value="COMPLETED" th:selected="${order.status == 'COMPLETED'}">已完成</option>
                                     <option value="CANCELLED" th:selected="${order.status == 'CANCELLED'}">已取消</option>
                                 </select>
-                                <button type="submit" class="btn btn-primary">更新</button>
+                                <button type="submit" class="btn btn-success">更新</button>
                             </form>
                         </td>
                     </tr>

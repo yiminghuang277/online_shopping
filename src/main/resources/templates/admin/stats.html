@@ -20,25 +20,26 @@
                 👤 <span sec:authentication="name"></span>
             </span>
             <form th:action="@{/logout}" method="post" style="display: inline;">
-    <button type="submit" style="background: none; border: none; color: white; cursor: pointer; font-size: 1rem;">
-        退出
-    </button>
-</form>
+                <button type="submit" style="background: none; border: none; color: white; cursor: pointer; font-size: 1rem;">
+                    退出
+                </button>
+            </form>
         </div>
     </nav>
 
     <div class="container">
-        <h1>销售统计</h1>
+        <h1>📊 销售统计</h1>
 
-        <!-- 统计卡片 -->
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 2rem;">
+        <!-- 总体统计 -->
+        <h2 style="margin-top: 2rem; margin-bottom: 1rem;">💰 总体统计</h2>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
             <!-- 总销售额 -->
             <div class="card" style="text-align: center; padding: 2rem;">
-                <h3 style="color: #666; margin-bottom: 1rem;">💰 总销售额</h3>
+                <h3 style="color: #666; margin-bottom: 1rem;">💵 总销售额</h3>
                 <p style="font-size: 2.5rem; color: #27ae60; font-weight: bold;">
                     ¥<span th:text="${#numbers.formatDecimal(totalSales, 1, 2)}"></span>
                 </p>
-                <small style="color: #999;">（仅统计已支付、已发货、已完成订单）</small>
+                <small style="color: #999;">（已支付 + 已发货 + 已完成）</small>
             </div>
 
             <!-- 订单总数 -->
@@ -50,33 +51,165 @@
                 <small style="color: #999;">（所有状态）</small>
             </div>
 
-            <!-- 已支付订单 -->
+            <!-- 有效订单 -->
             <div class="card" style="text-align: center; padding: 2rem;">
-                <h3 style="color: #666; margin-bottom: 1rem;">✅ 已支付订单</h3>
+                <h3 style="color: #666; margin-bottom: 1rem;">✅ 有效订单</h3>
                 <p style="font-size: 2.5rem; color: #e74c3c; font-weight: bold;">
                     <span th:text="${paidOrders}"></span>
                 </p>
                 <small style="color: #999;">
-                    支付率：<span th:text="${totalOrders > 0 ? #numbers.formatDecimal(paidOrders * 100.0 / totalOrders, 1, 1) : 0}"></span>%
+                    有效率：<span th:text="${totalOrders > 0 ? #numbers.formatDecimal(paidOrders * 100.0 / totalOrders, 1, 1) : 0}"></span>%
                 </small>
             </div>
         </div>
 
-        <!-- 提示信息 -->
+        <!-- 本月统计 -->
+        <h2 style="margin-top: 3rem; margin-bottom: 1rem;">📅 本月统计</h2>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem;">
+            <!-- 本月订单数 -->
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <h3 style="color: #666; margin-bottom: 1rem;">📈 本月订单数</h3>
+                <p style="font-size: 2.5rem; color: #3498db; font-weight: bold;">
+                    <span th:text="${monthOrders}"></span>
+                </p>
+                <small style="color: #999;">（本月所有订单）</small>
+            </div>
+
+            <!-- 本月销售额 -->
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <h3 style="color: #666; margin-bottom: 1rem;">💰 本月销售额</h3>
+                <p style="font-size: 2.5rem; color: #27ae60; font-weight: bold;">
+                    ¥<span th:text="${#numbers.formatDecimal(monthSales, 1, 2)}"></span>
+                </p>
+                <small style="color: #999;">（已支付 + 已发货 + 已完成）</small>
+            </div>
+        </div>
+
+        <!-- 各状态订单统计 -->
+        <h2 style="margin-top: 3rem; margin-bottom: 1rem;">📋 订单状态分布</h2>
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>订单状态</th>
+                        <th>订单数量</th>
+                        <th>订单金额</th>
+                        <th>占比</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>⏳ 待支付（PENDING）</td>
+                        <td th:text="${pendingCount}"></td>
+                        <td>¥<span th:text="${#numbers.formatDecimal(pendingSales, 1, 2)}"></span></td>
+                        <td>
+                            <span th:text="${totalOrders > 0 ? #numbers.formatDecimal(pendingCount * 100.0 / totalOrders, 1, 1) : 0}"></span>%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>✅ 已支付（PAID）</td>
+                        <td th:text="${paidCount}"></td>
+                        <td style="color: #27ae60; font-weight: bold;">
+                            ¥<span th:text="${#numbers.formatDecimal(paidSales, 1, 2)}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${totalOrders > 0 ? #numbers.formatDecimal(paidCount * 100.0 / totalOrders, 1, 1) : 0}"></span>%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>🚚 已发货（SHIPPED）</td>
+                        <td th:text="${shippedCount}"></td>
+                        <td style="color: #3498db; font-weight: bold;">
+                            ¥<span th:text="${#numbers.formatDecimal(shippedSales, 1, 2)}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${totalOrders > 0 ? #numbers.formatDecimal(shippedCount * 100.0 / totalOrders, 1, 1) : 0}"></span>%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>📦 已完成（COMPLETED）</td>
+                        <td th:text="${completedCount}"></td>
+                        <td style="color: #27ae60; font-weight: bold;">
+                            ¥<span th:text="${#numbers.formatDecimal(completedSales, 1, 2)}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${totalOrders > 0 ? #numbers.formatDecimal(completedCount * 100.0 / totalOrders, 1, 1) : 0}"></span>%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>❌ 已取消（CANCELLED）</td>
+                        <td th:text="${cancelledCount}"></td>
+                        <td style="color: #e74c3c;">
+                            ¥<span th:text="${#numbers.formatDecimal(cancelledSales, 1, 2)}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${totalOrders > 0 ? #numbers.formatDecimal(cancelledCount * 100.0 / totalOrders, 1, 1) : 0}"></span>%
+                        </td>
+                    </tr>
+                    <tr style="background-color: #f8f9fa; font-weight: bold;">
+                        <td>📊 总计</td>
+                        <td th:text="${totalOrders}"></td>
+                        <td>
+                            ¥<span th:text="${#numbers.formatDecimal(pendingSales + paidSales + shippedSales + completedSales + cancelledSales, 1, 2)}"></span>
+                        </td>
+                        <td>100%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 商品销售排行 -->
+        <h2 style="margin-top: 3rem; margin-bottom: 1rem;">🏆 商品销售排行</h2>
+        <div class="card">
+            <div th:if="${!#lists.isEmpty(productSales)}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>商品名称</th>
+                            <th>销售数量</th>
+                            <th>销售金额</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="product, stat : ${productSales}">
+                            <td>
+                                <span th:if="${stat.index == 0}" style="color: #f39c12; font-size: 1.5rem;">🥇</span>
+                                <span th:if="${stat.index == 1}" style="color: #95a5a6; font-size: 1.5rem;">🥈</span>
+                                <span th:if="${stat.index == 2}" style="color: #cd7f32; font-size: 1.5rem;">🥉</span>
+                                <span th:if="${stat.index > 2}" th:text="${stat.index + 1}"></span>
+                            </td>
+                            <td th:text="${product.productName}" style="font-weight: bold;"></td>
+                            <td th:text="${product.soldQuantity}" style="text-align: center;"></td>
+                            <td style="color: #27ae60; font-weight: bold;">
+                                ¥<span th:text="${#numbers.formatDecimal(product.salesAmount, 1, 2)}"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${#lists.isEmpty(productSales)}" style="text-align: center; padding: 2rem; color: #999;">
+                暂无商品销售数据
+            </div>
+        </div>
+
+        <!-- 统计说明 -->
         <div class="card" style="margin-top: 2rem;">
-            <h3>📊 统计说明</h3>
+            <h3>📖 统计说明</h3>
             <ul style="line-height: 2;">
-                <li><strong>总销售额</strong>：只统计状态为"已支付、已发货、已完成"的订单金额</li>
-                <li><strong>订单总数</strong>：包含所有状态的订单（待支付、已支付、已取消等）</li>
-                <li><strong>已支付订单</strong>：状态为"已支付"的订单数量</li>
-                <li><strong>支付率</strong>：已支付订单数 ÷ 订单总数 × 100%</li>
+                <li><strong>总销售额</strong>：包括"已支付"、"已发货"、"已完成"状态的订单金额总和</li>
+                <li><strong>本月统计</strong>：统计当月（从1号到今天）的订单数和销售额</li>
+                <li><strong>订单状态分布</strong>：展示各状态订单的数量、金额和占比</li>
+                <li><strong>商品销售排行</strong>：按销售数量降序排列，只统计已支付订单中的商品</li>
+                <li><strong>待支付订单金额</strong>：虽然显示金额，但不计入销售额</li>
+                <li><strong>已取消订单金额</strong>：显示已取消订单的金额损失</li>
             </ul>
         </div>
 
         <!-- 快捷链接 -->
         <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-            <a href="/admin/orders" class="btn btn-primary">查看订单</a>
-            <a href="/admin/products" class="btn btn-secondary">商品管理</a>
+            <a href="/admin/orders" class="btn btn-primary">📋 查看订单</a>
+            <a href="/admin/products" class="btn btn-secondary">🛍️ 商品管理</a>
         </div>
     </div>
 </body>

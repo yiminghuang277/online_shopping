@@ -1,9 +1,13 @@
 package com.shop.controller;
 
+import com.shop.dto.ProductSalesDTO;
 import com.shop.entity.Order;
+import com.shop.entity.OrderItem;
 import com.shop.entity.Product;
+import com.shop.entity.User;
 import com.shop.service.OrderService;
 import com.shop.service.ProductService;
+import com.shop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +29,9 @@ public class AdminController {
     
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private UserService userService;
     
     /**
      * 管理员首页
@@ -125,6 +132,28 @@ public class AdminController {
         }
         return "redirect:/admin/orders";
     }
+    /**
+    * 管理员查看订单详情
+    */
+    @GetMapping("/orders/{id}")
+    public String viewOrderDetail(@PathVariable("id") Long id, Model model) {
+        Order order = orderService.findById(id);
+        if (order == null) {
+            return "redirect:/admin/orders";
+        }
+    
+        // 获取订单明细
+        List<OrderItem> orderItems = orderService.findOrderItems(id);
+    
+        // 获取用户信息
+        User user = userService.findById(order.getUserId());
+    
+        model.addAttribute("order", order);
+        model.addAttribute("orderItems", orderItems);
+        model.addAttribute("user", user);
+    
+        return "admin/order-detail";
+    }
     
     // ==================== 销售统计 ====================
     
@@ -133,14 +162,61 @@ public class AdminController {
      */
     @GetMapping("/stats")
     public String statistics(Model model) {
+        // 总体统计
         BigDecimal totalSales = orderService.getTotalSales();
         long totalOrders = orderService.getTotalOrders();
         long paidOrders = orderService.getPaidOrderCount();
-        
+
+        // 各状态订单金额统计
+        BigDecimal pendingSales = orderService.getSalesByStatus("PENDING");
+        BigDecimal paidSales = orderService.getSalesByStatus("PAID");
+        BigDecimal shippedSales = orderService.getSalesByStatus("SHIPPED");
+        BigDecimal completedSales = orderService.getSalesByStatus("COMPLETED");
+        BigDecimal cancelledSales = orderService.getSalesByStatus("CANCELLED");
+
+        // 各状态订单数量统计
+        long pendingCount = orderService.countByStatus("PENDING");
+        long paidCount = orderService.countByStatus("PAID");
+        long shippedCount = orderService.countByStatus("SHIPPED");
+        long completedCount = orderService.countByStatus("COMPLETED");
+        long cancelledCount = orderService.countByStatus("CANCELLED");
+
+        // 本月统计
+        long monthOrders = orderService.getOrdersThisMonth();
+        BigDecimal monthSales = orderService.getSalesThisMonth();
+
+        // 商品销售统计
+        List<ProductSalesDTO> productSales = orderService.getProductSalesStatistics();
+
+        // 传递数据到视图
         model.addAttribute("totalSales", totalSales);
         model.addAttribute("totalOrders", totalOrders);
         model.addAttribute("paidOrders", paidOrders);
-        
+
+        model.addAttribute("pendingSales", pendingSales);
+        model.addAttribute("paidSales", paidSales);
+        model.addAttribute("shippedSales", shippedSales);
+        model.addAttribute("completedSales", completedSales);
+        model.addAttribute("cancelledSales", cancelledSales);
+
+        model.addAttribute("pendingCount", pendingCount);
+        model.addAttribute("paidCount", paidCount);
+        model.addAttribute("shippedCount", shippedCount);
+        model.addAttribute("completedCount", completedCount);
+        model.addAttribute("cancelledCount", cancelledCount);
+
+        model.addAttribute("monthOrders", monthOrders);
+        model.addAttribute("monthSales", monthSales);
+
+        model.addAttribute("productSales", productSales);
+
         return "admin/stats";
+    }
+
+    /**
+     * 新增：根据状态统计订单数（供内部使用）
+     */
+    private long countByStatus(String status) {
+        return orderService.countByStatus(status);
     }
 }

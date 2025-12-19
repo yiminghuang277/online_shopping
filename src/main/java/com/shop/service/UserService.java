@@ -1,6 +1,7 @@
 package com.shop.service;
 
 import com.shop.entity.User;
+import com.shop.repository.OrderRepository;
 import com.shop.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +20,8 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;  // Spring Security 提供的密码加密器
     
+    @Autowired
+    private OrderRepository orderRepository;
     /**
      * 用户注册
      * @Transactional 标记事务：如果出错自动回滚
@@ -58,5 +61,30 @@ public class UserService {
      */
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
+    }
+    /**
+    * 根据 ID 查找用户
+    */
+    public User findById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+    
+    /**
+     * 注销账号（软删除或硬删除）
+     * 这里使用硬删除，如果需要软删除可以添加 deleted 字段
+     */
+    @Transactional
+    public void deleteAccount(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("用户不存在"));
+
+        // 检查是否有未完成的订单
+        long pendingOrders = orderRepository.countByUserIdAndStatus(userId, "PENDING");
+        if (pendingOrders > 0) {
+            throw new RuntimeException("您还有待支付的订单，无法注销账号");
+        }
+
+        // 删除用户（会级联删除相关订单，因为设置了 ON DELETE CASCADE）
+        userRepository.deleteById(userId);
     }
 }

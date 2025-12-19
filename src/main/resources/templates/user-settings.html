@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>账号设置</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="/" class="logo">🛒 在线购物网站</a>
+        <div class="nav-links">
+            <a href="/products">商品列表</a>
+            <a href="/cart">购物车</a>
+            <a href="/orders">我的订单</a>
+            <a href="/user/settings">账号设置</a>
+            <a sec:authorize="hasRole('ADMIN')" href="/admin">管理后台</a>
+            <span style="color: #3498db;">
+                👤 <span sec:authentication="name"></span>
+            </span>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" style="background: none; border: none; color: white; cursor: pointer; font-size: 1rem;">
+                    退出
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>⚙️ 账号设置</h1>
+
+        <!-- 消息提示 -->
+        <div th:if="${message}" class="alert alert-success">
+            <span th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-error">
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- 账号信息 -->
+        <div class="card">
+            <h3>📋 账号信息</h3>
+            <p><strong>用户名：</strong><span th:text="${user.username}"></span></p>
+            <p><strong>邮箱：</strong><span th:text="${user.email != null ? user.email : '未设置'}"></span></p>
+            <p><strong>角色：</strong>
+                <span th:switch="${user.role}">
+                    <span th:case="'ADMIN'" style="color: #e74c3c; font-weight: bold;">管理员</span>
+                    <span th:case="'USER'" style="color: #3498db;">普通用户</span>
+                </span>
+            </p>
+            <p><strong>注册时间：</strong>
+               <span th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></span>
+            </p>
+        </div>
+
+        <!-- 危险操作区 -->
+        <div class="card" style="border: 2px solid #e74c3c;">
+            <h3 style="color: #e74c3c;">⚠️ 危险操作</h3>
+            <div style="background-color: #fff3cd; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                <strong>注意：</strong>注销账号后将无法恢复，您的所有订单记录也将被删除！
+            </div>
+
+            <form th:action="@{/user/delete-account}" method="post" 
+                  onsubmit="return confirm('确定要注销账号吗？此操作不可恢复！\n\n请再次确认：\n1. 您的所有订单记录将被删除\n2. 账号无法恢复\n\n确定继续吗？')">
+                <button type="submit" class="btn btn-danger">
+                    🗑️ 注销账号
+                </button>
+            </form>
+            
+            <p style="color: #666; margin-top: 1rem; font-size: 0.9rem;">
+                如果您有待支付的订单，请先取消或完成支付后再注销账号。
+            </p>
+        </div>
+
+        <!-- 返回按钮 -->
+        <div style="margin-top: 2rem;">
+            <a href="/products" class="btn btn-secondary">← 返回首页</a>
+        </div>
+    </div>
+</body>
+</html>
