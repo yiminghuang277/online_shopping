@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线购物网站 - 首页</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="/" class="logo">🛒 在线购物网站</a>
+        <div class="nav-links">
+            <a href="/products">商品列表</a>
+            <a href="/cart">购物车</a>
+            <a href="/login">登录</a>
+            <a href="/register">注册</a>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <div class="container">
+        <div class="card" style="text-align: center; padding: 3rem;">
+            <h1>欢迎来到在线购物网站</h1>
+            <p style="font-size: 1.2rem; margin: 2rem 0;">
+                精选优质商品，一站式购物体验
+            </p>
+            <a href="/products" class="btn btn-primary" style="font-size: 1.2rem; padding: 1rem 2rem;">
+                开始购物 →
+            </a>
+        </div>
+
+        <!-- 特色介绍 -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem;">
+            <div class="card" style="text-align: center;">
+                <h3>🎁 精选商品</h3>
+                <p>品质保证，种类丰富</p>
+            </div>
+            <div class="card" style="text-align: center;">
+                <h3>🚚 快速配送</h3>
+                <p>下单即发货，送货上门</p>
+            </div>
+            <div class="card" style="text-align: center;">
+                <h3>💳 安全支付</h3>
+                <p>多种支付方式，交易安全</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <div class="footer">
+        <p>&copy; 2025 在线购物网站 | 课程大作业项目</p>
+    </div>
+</body>
+</html>

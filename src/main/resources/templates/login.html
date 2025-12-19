@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="/" class="logo">🛒 在线购物网站</a>
+        <div class="nav-links">
+            <a href="/products">商品列表</a>
+            <a href="/register">注册</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card" style="max-width: 400px; margin: 3rem auto;">
+            <h2 style="text-align: center; margin-bottom: 2rem;">用户登录</h2>
+
+            <!-- 错误消息 -->
+            <div th:if="${error}" class="alert alert-error">
+                <span th:text="${error}"></span>
+            </div>
+
+            <!-- 成功消息（注册成功后显示）-->
+            <div th:if="${message}" class="alert alert-success">
+                <span th:text="${message}"></span>
+            </div>
+
+            <!-- 登录表单 -->
+            <form th:action="@{/login}" method="post">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username" 
+                           class="form-control" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" 
+                           class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="remember-me"> 记住我（7天）
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    登录
+                </button>
+            </form>
+
+            <p style="text-align: center; margin-top: 1rem;">
+                还没有账号？ <a href="/register">立即注册</a>
+            </p>
+
+            <!-- 测试账号提示 -->
+            <div class="alert alert-info" style="margin-top: 2rem;">
+                <strong>测试账号：</strong><br>
+                普通用户：user1 / 123456<br>
+                管理员：admin / 123456
+            </div>
+        </div>
+    </div>
+</body>
+</html>

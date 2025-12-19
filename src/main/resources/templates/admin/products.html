@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品管理</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="/" class="logo">🛒 管理后台</a>
+        <div class="nav-links">
+            <a href="/admin/products">商品管理</a>
+            <a href="/admin/orders">订单管理</a>
+            <a href="/admin/stats">销售统计</a>
+            <a href="/products">返回前台</a>
+            <span style="color: #3498db;">
+                👤 <span sec:authentication="name"></span>
+            </span>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+    <button type="submit" style="background: none; border: none; color: white; cursor: pointer; font-size: 1rem;">
+        退出
+    </button>
+</form>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>商品管理</h1>
+            <a href="/admin/products/add" class="btn btn-success">➕ 添加商品</a>
+        </div>
+
+        <!-- 消息提示 -->
+        <div th:if="${message}" class="alert alert-success">
+            <span th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-error">
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- 商品表格 -->
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>图片</th>
+                        <th>商品名称</th>
+                        <th>分类</th>
+                        <th>价格</th>
+                        <th>库存</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="product : ${products}">
+                        <td th:text="${product.id}"></td>
+                        <td>
+                            <img th:src="${product.imageUrl}" 
+                                 alt="商品图片" 
+                                 style="width: 60px; height: 60px; object-fit: cover;">
+                        </td>
+                        <td th:text="${product.name}"></td>
+                        <td th:text="${product.category}"></td>
+                        <td>¥<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}"></span></td>
+                        <td>
+                            <span th:text="${product.stock}"></span>
+                            <span th:if="${product.stock == 0}" style="color: #e74c3c;"> (缺货)</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/admin/products/edit/{id}(id=${product.id})}" 
+                               class="btn btn-primary" style="margin-right: 0.5rem;">
+                                编辑
+                            </a>
+                            <form th:action="@{/admin/products/delete/{id}(id=${product.id})}" 
+                                  method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-danger"
+                                        onclick="return confirm('确定要删除这个商品吗？')">
+                                    删除
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p style="margin-top: 1rem; color: #666;">
+            共 <strong th:text="${#lists.size(products)}"></strong> 件商品
+        </p>
+    </div>
+</body>
+</html>

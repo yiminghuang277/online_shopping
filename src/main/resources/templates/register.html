@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="/" class="logo">🛒 在线购物网站</a>
+        <div class="nav-links">
+            <a href="/products">商品列表</a>
+            <a href="/login">登录</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card" style="max-width: 400px; margin: 3rem auto;">
+            <h2 style="text-align: center; margin-bottom: 2rem;">用户注册</h2>
+
+            <!-- 错误消息 -->
+            <div th:if="${error}" class="alert alert-error">
+                <span th:text="${error}"></span>
+            </div>
+
+            <!-- 注册表单 -->
+            <form th:action="@{/register}" method="post">
+                <div class="form-group">
+                    <label for="username">用户名 *</label>
+                    <input type="text" id="username" name="username" 
+                           class="form-control" required 
+                           minlength="3" maxlength="20"
+                           placeholder="3-20个字符">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">邮箱（可选）</label>
+                    <input type="email" id="email" name="email" 
+                           class="form-control"
+                           placeholder="example@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">密码 *</label>
+                    <input type="password" id="password" name="password" 
+                           class="form-control" required 
+                           minlength="6"
+                           placeholder="至少6位">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">确认密码 *</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" 
+                           class="form-control" required 
+                           minlength="6"
+                           placeholder="再次输入密码">
+                </div>
+
+                <button type="submit" class="btn btn-success" style="width: 100%;">
+                    注册
+                </button>
+            </form>
+
+            <p style="text-align: center; margin-top: 1rem;">
+                已有账号？ <a href="/login">立即登录</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

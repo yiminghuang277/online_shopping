@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>销售统计</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="/" class="logo">🛒 管理后台</a>
+        <div class="nav-links">
+            <a href="/admin/products">商品管理</a>
+            <a href="/admin/orders">订单管理</a>
+            <a href="/admin/stats">销售统计</a>
+            <a href="/products">返回前台</a>
+            <span style="color: #3498db;">
+                👤 <span sec:authentication="name"></span>
+            </span>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+    <button type="submit" style="background: none; border: none; color: white; cursor: pointer; font-size: 1rem;">
+        退出
+    </button>
+</form>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>销售统计</h1>
+
+        <!-- 统计卡片 -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 2rem;">
+            <!-- 总销售额 -->
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <h3 style="color: #666; margin-bottom: 1rem;">💰 总销售额</h3>
+                <p style="font-size: 2.5rem; color: #27ae60; font-weight: bold;">
+                    ¥<span th:text="${#numbers.formatDecimal(totalSales, 1, 2)}"></span>
+                </p>
+                <small style="color: #999;">（仅统计已支付、已发货、已完成订单）</small>
+            </div>
+
+            <!-- 订单总数 -->
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <h3 style="color: #666; margin-bottom: 1rem;">📦 订单总数</h3>
+                <p style="font-size: 2.5rem; color: #3498db; font-weight: bold;">
+                    <span th:text="${totalOrders}"></span>
+                </p>
+                <small style="color: #999;">（所有状态）</small>
+            </div>
+
+            <!-- 已支付订单 -->
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <h3 style="color: #666; margin-bottom: 1rem;">✅ 已支付订单</h3>
+                <p style="font-size: 2.5rem; color: #e74c3c; font-weight: bold;">
+                    <span th:text="${paidOrders}"></span>
+                </p>
+                <small style="color: #999;">
+                    支付率：<span th:text="${totalOrders > 0 ? #numbers.formatDecimal(paidOrders * 100.0 / totalOrders, 1, 1) : 0}"></span>%
+                </small>
+            </div>
+        </div>
+
+        <!-- 提示信息 -->
+        <div class="card" style="margin-top: 2rem;">
+            <h3>📊 统计说明</h3>
+            <ul style="line-height: 2;">
+                <li><strong>总销售额</strong>：只统计状态为"已支付、已发货、已完成"的订单金额</li>
+                <li><strong>订单总数</strong>：包含所有状态的订单（待支付、已支付、已取消等）</li>
+                <li><strong>已支付订单</strong>：状态为"已支付"的订单数量</li>
+                <li><strong>支付率</strong>：已支付订单数 ÷ 订单总数 × 100%</li>
+            </ul>
+        </div>
+
+        <!-- 快捷链接 -->
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <a href="/admin/orders" class="btn btn-primary">查看订单</a>
+            <a href="/admin/products" class="btn btn-secondary">商品管理</a>
+        </div>
+    </div>
+</body>
+</html>

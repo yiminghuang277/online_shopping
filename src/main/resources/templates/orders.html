@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的订单</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="/" class="logo">🛒 在线购物网站</a>
+        <div class="nav-links">
+            <a href="/products">商品列表</a>
+            <a href="/cart">购物车</a>
+            <a href="/orders">我的订单</a>
+            <a sec:authorize="hasRole('ADMIN')" href="/admin">管理后台</a>
+            <span style="color: #3498db;">
+                👤 <span sec:authentication="name"></span>
+            </span>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+    <button type="submit" style="background: none; border: none; color: white; cursor: pointer; font-size: 1rem;">
+        退出
+    </button>
+</form>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>我的订单</h1>
+
+        <!-- 订单列表 -->
+        <div th:if="${!#lists.isEmpty(orders)}">
+            <div class="card" th:each="order : ${orders}" style="margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem;">
+                    <div>
+                        <strong>订单号：</strong><span th:text="${order.id}"></span>
+                    </div>
+                    <div>
+                        <strong>下单时间：</strong>
+                        <span th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                    </div>
+                    <div>
+                        <strong>状态：</strong>
+                        <span th:switch="${order.status}">
+                            <span th:case="'PENDING'" style="color: #f39c12;">⏳ 待支付</span>
+                            <span th:case="'PAID'" style="color: #27ae60;">✅ 已支付</span>
+                            <span th:case="'SHIPPED'" style="color: #3498db;">🚚 已发货</span>
+                            <span th:case="'COMPLETED'" style="color: #95a5a6;">📦 已完成</span>
+                            <span th:case="'CANCELLED'" style="color: #e74c3c;">❌ 已取消</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>订单金额：</strong>
+                        <span style="color: #e74c3c; font-size: 1.2rem; font-weight: bold;">
+                            ¥<span th:text="${#numbers.formatDecimal(order.totalPrice, 1, 2)}"></span>
+                        </span>
+                    </div>
+                    <div>
+                        <a th:href="@{/order/{id}(id=${order.id})}" class="btn btn-primary">查看详情</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 空订单 -->
+        <div th:if="${#lists.isEmpty(orders)}" 
+             class="card" 
+             style="text-align: center; padding: 3rem;">
+            <h3>📋 还没有订单</h3>
+            <p style="margin: 1rem 0;">快去挑选喜欢的商品吧！</p>
+            <a href="/products" class="btn btn-primary">去购物 →</a>
+        </div>
+    </div>
+</body>
+</html>

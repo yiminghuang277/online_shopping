@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>确认订单</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="/" class="logo">🛒 在线购物网站</a>
+        <div class="nav-links">
+            <a href="/products">商品列表</a>
+            <a href="/cart">购物车</a>
+            <a href="/orders">我的订单</a>
+            <span style="color: #3498db;">
+                👤 <span sec:authentication="name"></span>
+            </span>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+    <button type="submit" style="background: none; border: none; color: white; cursor: pointer; font-size: 1rem;">
+        退出
+    </button>
+</form>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>确认订单</h1>
+
+        <div class="card">
+            <h3>订单商品</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>商品名称</th>
+                        <th>单价</th>
+                        <th>数量</th>
+                        <th>小计</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${cartItems}">
+                        <td th:text="${item.productName}"></td>
+                        <td>¥<span th:text="${#numbers.formatDecimal(item.price, 1, 2)}"></span></td>
+                        <td th:text="${item.quantity}"></td>
+                        <td>¥<span th:text="${#numbers.formatDecimal(item.subtotal, 1, 2)}"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="text-align: right; padding: 1rem; border-top: 2px solid #ddd;">
+                <h2>
+                    订单总额：¥<span th:text="${#numbers.formatDecimal(cartTotal, 1, 2)}" 
+                                  style="color: #e74c3c;"></span>
+                </h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>收货信息</h3>
+            <p>收货人：<span sec:authentication="name"></span></p>
+            <p style="color: #666;">（简化版，无需填写地址）</p>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
+            <a href="/cart" class="btn btn-secondary">返回购物车</a>
+            <form th:action="@{/order/submit}" method="post">
+                <button type="submit" class="btn btn-success" style="font-size: 1.2rem;">
+                    提交订单
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

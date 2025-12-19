@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单管理</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="/" class="logo">🛒 管理后台</a>
+        <div class="nav-links">
+            <a href="/admin/products">商品管理</a>
+            <a href="/admin/orders">订单管理</a>
+            <a href="/admin/stats">销售统计</a>
+            <a href="/products">返回前台</a>
+            <span style="color: #3498db;">
+                👤 <span sec:authentication="name"></span>
+            </span>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+    <button type="submit" style="background: none; border: none; color: white; cursor: pointer; font-size: 1rem;">
+        退出
+    </button>
+</form>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>订单管理</h1>
+
+        <!-- 消息提示 -->
+        <div th:if="${message}" class="alert alert-success">
+            <span th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-error">
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- 订单表格 -->
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>订单号</th>
+                        <th>用户 ID</th>
+                        <th>订单金额</th>
+                        <th>状态</th>
+                        <th>下单时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="order : ${orders}">
+                        <td th:text="${order.id}"></td>
+                        <td th:text="${order.userId}"></td>
+                        <td>¥<span th:text="${#numbers.formatDecimal(order.totalPrice, 1, 2)}"></span></td>
+                        <td>
+                            <span th:switch="${order.status}">
+                                <span th:case="'PENDING'" style="color: #f39c12;">待支付</span>
+                                <span th:case="'PAID'" style="color: #27ae60;">已支付</span>
+                                <span th:case="'SHIPPED'" style="color: #3498db;">已发货</span>
+                                <span th:case="'COMPLETED'" style="color: #95a5a6;">已完成</span>
+                                <span th:case="'CANCELLED'" style="color: #e74c3c;">已取消</span>
+                            </span>
+                        </td>
+                        <td th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td>
+                            <!-- 状态更新表单 -->
+                            <form th:action="@{/admin/orders/{id}/status(id=${order.id})}" 
+                                  method="post" style="display: inline-flex; gap: 0.5rem;">
+                                <select name="status" class="form-control" style="width: auto;">
+                                    <option value="PENDING" th:selected="${order.status == 'PENDING'}">待支付</option>
+                                    <option value="PAID" th:selected="${order.status == 'PAID'}">已支付</option>
+                                    <option value="SHIPPED" th:selected="${order.status == 'SHIPPED'}">已发货</option>
+                                    <option value="COMPLETED" th:selected="${order.status == 'COMPLETED'}">已完成</option>
+                                    <option value="CANCELLED" th:selected="${order.status == 'CANCELLED'}">已取消</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">更新</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p style="margin-top: 1rem; color: #666;">
+            共 <strong th:text="${#lists.size(orders)}"></strong> 个订单
+        </p>
+    </div>
+</body>
+</html>

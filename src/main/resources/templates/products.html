@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品列表</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="/" class="logo">🛒 在线购物网站</a>
+        <div class="nav-links">
+            <a href="/products">商品列表</a>
+            
+            <!-- 已登录用户显示 -->
+            <span sec:authorize="isAuthenticated()">
+                <a href="/cart">购物车</a>
+                <a href="/orders">我的订单</a>
+                <span style="color: #3498db;">
+                    👤 <span sec:authentication="name"></span>
+                </span>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+    <button type="submit" style="background: none; border: none; color: white; cursor: pointer; font-size: 1rem;">
+        退出
+    </button>
+</form>
+            </span>
+            
+            <!-- 管理员链接 -->
+            <a sec:authorize="hasRole('ADMIN')" href="/admin">管理后台</a>
+            
+            <!-- 未登录用户显示 -->
+            <span sec:authorize="!isAuthenticated()">
+                <a href="/login">登录</a>
+                <a href="/register">注册</a>
+            </span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>商品列表</h1>
+
+        <!-- 搜索栏 -->
+        <div class="card">
+            <form th:action="@{/products}" method="get" style="display: flex; gap: 1rem;">
+                <input type="text" name="search" 
+                       class="form-control" 
+                       placeholder="搜索商品..."
+                       th:value="${search}"
+                       style="flex: 1;">
+                <button type="submit" class="btn btn-primary">搜索</button>
+                <a href="/products" class="btn btn-secondary">清除</a>
+            </form>
+        </div>
+
+        <!-- 消息提示 -->
+        <div th:if="${message}" class="alert alert-success">
+            <span th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-error">
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- 商品数量 -->
+        <p style="margin: 1rem 0;">
+            共找到 <strong th:text="${#lists.size(products)}"></strong> 件商品
+        </p>
+
+        <!-- 商品网格 -->
+        <div class="product-grid">
+            <div class="product-card" th:each="product : ${products}">
+                <img th:src="${product.imageUrl}" alt="商品图片">
+                <div class="product-info">
+                    <div class="product-name" th:text="${product.name}"></div>
+                    <div class="product-price">
+                        ¥<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}"></span>
+                    </div>
+                    <div class="product-stock">
+                        库存：<span th:text="${product.stock}"></span>
+                    </div>
+                    <p th:text="${product.description}" 
+                       style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;"></p>
+                    
+                    <!-- 添加到购物车表单 -->
+                    <form th:action="@{/cart/add}" method="post" sec:authorize="isAuthenticated()">
+                        <input type="hidden" name="productId" th:value="${product.id}">
+                        <input type="number" name="quantity" value="1" min="1" 
+                               th:max="${product.stock}"
+                               class="form-control" 
+                               style="margin-bottom: 0.5rem;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;"
+                                th:disabled="${product.stock == 0}">
+                            <span th:if="${product.stock > 0}">加入购物车</span>
+                            <span th:if="${product.stock == 0}">已售罄</span>
+                        </button>
+                    </form>
+                    
+                    <!-- 未登录提示 -->
+                    <a sec:authorize="!isAuthenticated()" 
+                       href="/login" 
+                       class="btn btn-primary" 
+                       style="width: 100%; display: block; text-align: center;">
+                        登录后购买
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 空状态 -->
+        <div th:if="${#lists.isEmpty(products)}" 
+             class="card" 
+             style="text-align: center; padding: 3rem;">
+            <h3>😔 没有找到商品</h3>
+            <p>试试搜索其他关键词</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 在线购物网站</p>
+    </div>
+</body>
+</html>

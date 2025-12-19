@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.id != null ? '编辑商品' : '添加商品'}"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="/" class="logo">🛒 管理后台</a>
+        <div class="nav-links">
+            <a href="/admin/products">商品管理</a>
+            <a href="/admin/orders">订单管理</a>
+            <a href="/admin/stats">销售统计</a>
+            <span style="color: #3498db;">
+                👤 <span sec:authentication="name"></span>
+            </span>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+    <button type="submit" style="background: none; border: none; color: white; cursor: pointer; font-size: 1rem;">
+        退出
+    </button>
+</form>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 th:text="${product.id != null ? '编辑商品' : '添加商品'}"></h1>
+
+        <div class="card" style="max-width: 600px;">
+            <form th:action="@{/admin/products/save}" th:object="${product}" method="post">
+                <!-- 隐藏字段：商品 ID（编辑时使用）-->
+                <input type="hidden" th:field="*{id}">
+
+                <div class="form-group">
+                    <label for="name">商品名称 *</label>
+                    <input type="text" id="name" th:field="*{name}" 
+                           class="form-control" required maxlength="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">商品描述</label>
+                    <textarea id="description" th:field="*{description}" 
+                              class="form-control" rows="4" 
+                              placeholder="详细描述商品特点..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="price">价格 * （元）</label>
+                    <input type="number" id="price" th:field="*{price}" 
+                           class="form-control" required 
+                           min="0" step="0.01" placeholder="0.00">
+                </div>
+
+                <div class="form-group">
+                    <label for="stock">库存 *</label>
+                    <input type="number" id="stock" th:field="*{stock}" 
+                           class="form-control" required 
+                           min="0" placeholder="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="category">分类</label>
+                    <input type="text" id="category" th:field="*{category}" 
+                           class="form-control" maxlength="50"
+                           placeholder="如：手机、电脑、耳机">
+                </div>
+
+                <div class="form-group">
+                    <label for="imageUrl">图片 URL</label>
+                    <input type="text" id="imageUrl" th:field="*{imageUrl}" 
+                           class="form-control" maxlength="255"
+                           placeholder="https://example.com/image.jpg">
+                    <small style="color: #666;">
+                        提示：可使用 https://via.placeholder.com/300x300?text=商品名 生成占位图
+                    </small>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-success">保存</button>
+                    <a href="/admin/products" class="btn btn-secondary">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
